@@ -151,6 +151,13 @@
   tags:
       - always
 
+- name: Include custom NPSD (S1) patches
+  ansible.builtin.import_tasks:
+      file: custom/main.yml
+  when: ubtu22cis_custom
+  tags:
+      - custom
+
 - name: Include section 1 patches
   ansible.builtin.import_tasks:
       file: section_1/main.yml

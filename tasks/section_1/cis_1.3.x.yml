@@ -17,6 +17,17 @@
             manager: auto
         when: ubtu22cis_rule_1_3_1_aide_added.skipped is not defined
 
+      - name: "SCORED | 1.3.1 | PATCH | Ensure AIDE ignores NPSD (SecureONE) mutable resources | Configure AIDE"
+        copy:
+          dest: /etc/aide/aide.conf.d/80_aide_secureone
+          content: |
+            !/secureone/data
+            !/var/lib/docker
+            !/var/log
+        when:
+            - ubtu22cis_rule_1_3_1_aide_added.skipped is not defined
+            - ubtu22cis_aide_ignore_secureone
+
       - name: "1.3.1 | PATCH | Ensure AIDE is installed | Configure AIDE"
         ansible.builtin.shell: aideinit && mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
         args:
@@ -36,6 +47,7 @@
       - patch
       - rule_1.3.1
       - aide
+      - aide_config_secureone
 
 - name: "1.3.2 | PATCH | Ensure filesystem integrity is regularly checked"
   ansible.builtin.cron:

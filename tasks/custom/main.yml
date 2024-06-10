@@ -1,0 +1,26 @@
+---
+- name: "NOTSCORED | CUSTOM | Enable logging for cron jobs"
+  lineinfile:
+    dest: /etc/rsyslog.d/50-default.conf
+    regexp: "^#?cron\\.\\*\\s+\\/var\\/log\\/cron.log"
+    line: "cron.*                         /var/log/cron.log"
+    state: present
+
+- name: "NOTSCORED | CUSTOM | /etc/sysctl.conf should be 0600"
+  file:
+    path: /etc/sysctl.conf
+    mode: 0600
+
+- name: "NOTSCORED | CUSTOM | Clear exiting audit rules"
+  shell: "find /etc/audit/rules.d -name ubuntu1804cis* -delete"
+  args:
+    executable: /bin/bash
+  changed_when: false
+  check_mode: false
+
+- name: "NOTSCORED | CUSTOM | Fix AAD SSH Login ends Match User block"
+  replace:
+    path: /etc/ssh/sshd_config
+    regexp: '(Match User[\s\S]*AuthorizedKeysCommand[\s\S]*aad_certhandler[\s\S]*AuthorizedKeysCommandUser root\n(?!Match all))'
+    replace: '\1Match all\n'
+    validate: '/usr/sbin/sshd -f %s -t'
